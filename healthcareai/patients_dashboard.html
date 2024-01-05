@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patients Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('animated-svg.gif'); /* Specify the correct path to your GIF file */
+        background-size: cover; /* This will scale the image to cover the entire body element */
+        background-repeat: no-repeat;
+        }
+
+        header {
+            background-color: black;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-button {
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .profile-btn {
+            position: absolute;
+            top: 3px;
+            right: 10px;
+            cursor: pointer;
+            width: 65px;
+            height: 30px;
+            background-color: #435360;
+            color: white;
+            border: none;
+            border-radius: 70%;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Styling for the modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            width: 70%;
+        }
+
+        /* Styling for the close button in the modal */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Styling for the checklist table */
+        #checklist {
+            width: 100%;
+            border: 2px solid black;
+            background-color: white;
+        }
+
+        #checklist th, #checklist td {
+            padding: 10px;
+            text-align: left;
+            color: black;
+        }
+
+        #checklist th {
+            background-color: black;
+            color: white;
+        }
+
+        #checklist input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .submit-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+    <!-- Include Font Awesome (you can get the link from the Font Awesome website) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="nav-buttons">
+            <div class="nav-button" id="home-button">Home</div>
+            <div class="nav-button" id="about-button">About</div>
+            <div class="nav-button" id="contact-button">Contact Us</div>
+            <div class="nav-button" id="guidelines-button">Guidelines</div>
+        </div>
+        <button class="profile-btn" id="profile-btn"><i class="fas fa-user"></i></button>
+    </header>
+    
+    <div class="container">
+        <h1 style="color: aliceblue;">Welcome to the Patient Dashboard</h1>
+        <h2 style="color: aliceblue;">Your Checklist</h2>
+        <table id="checklist"></table>
+        <button class="submit-button" id="submit-button">Submit Today's Report</button>
+    </div>
+
+    <!-- Modal for displaying user details -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="modal-close">&times;</span>
+            <h2>Your Profile</h2>
+            <p><strong>Name:</strong> <span id="modal-name"></span></p>
+            <p><strong>Last Name:</strong> <span id="modal-last_name"></span></p>
+            <p><strong>Email:</strong> <span id="modal-email"></span></p>
+            <p><strong>Phone Number:</strong> <span id="modal-phone_number"></span></p>
+            <p><strong>Address:</strong> <span id="modal-address"></span></p>
+            <p><strong>Blood Group:</strong> <span id="modal-blood_group"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const profileBtn = document.getElementById("profile-btn");
+        const modal = document.getElementById("myModal");
+        const modalClose = document.getElementById("modal-close");
+
+        // Function to open the modal and fetch user details
+        function openProfileModal() {
+            const userEmail = sessionStorage.getItem("userEmail"); // Get the user's email from the session
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `get_user_profile.php?email=${userEmail}`, true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const userData = JSON.parse(xhr.responseText);
+                    document.getElementById("modal-name").textContent = userData.first_name;
+                    document.getElementById("modal-last_name").textContent = userData.last_name;
+                    document.getElementById("modal-email").textContent = userData.email;
+                    document.getElementById("modal-phone_number").textContent = userData.phone_number;
+                    document.getElementById("modal-address").textContent = userData.address;
+                    document.getElementById("modal-blood_group").textContent = userData.blood_group;
+
+                    modal.style.display = "block"; // Display the modal
+                } else {
+                    alert("Failed to fetch user profile data.");
+                }
+            };
+
+            xhr.send();
+        }
+
+        // Close the modal when the "X" button is clicked
+        modalClose.addEventListener("click", function () {
+            modal.style.display = "none";
+        });
+
+        // Close the modal when clicking outside of it
+        window.addEventListener("click", function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        });
+
+        // Add a click event listener to the profile button
+        profileBtn.addEventListener("click", function () {
+            openProfileModal();
+        });
+
+        const homeButton = document.getElementById("home-button");
+
+        homeButton.addEventListener("click", function () {
+            window.location.href = "patients_dashboard.html";
+        });
+
+        const aboutButton = document.getElementById("about-button");
+        const contactButton = document.getElementById("contact-button");
+        const guidelinesButton = document.getElementById("guidelines-button");
+
+        aboutButton.addEventListener("click", function () {
+            window.location.href = "about_patients.html";
+        });
+
+        contactButton.addEventListener("click", function () {
+            window.location.href = "contactus.html";
+        });
+
+        guidelinesButton.addEventListener("click", function () {
+            window.location.href = "Guidelines_patients.html";
+        });
+
+        const checklistElement = document.getElementById("checklist");
+        const userEmail = sessionStorage.getItem("userEmail");
+
+        // Define the 'allChecked' variable to track if all checkboxes are checked
+        let allChecked = false;
+
+        function displayChecklist() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `get_user_profile.php?email=${userEmail}`, true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const userData = JSON.parse(xhr.responseText);
+                    const result = userData.result;
+
+                    if (result === "Benign") {
+                        displayBenignChecklist();
+                    } else if (result === "Malignant") {
+                        displayMalignantChecklist();
+                    } else {
+                        checklistElement.innerHTML = "No checklist available for this condition.";
+                    }
+                } else {
+                    alert("Failed to fetch user profile data.");
+                }
+            };
+
+            xhr.send();
+        }
+
+        function displayBenignChecklist() {
+            const benignMorningChecklist = [
+                "Morning Routine:",
+                "Medication: Take any prescribed oral medications as directed by your healthcare provider. Note down the name of the medication, dosage, and time.",
+                "Ointment Application: Apply any prescribed topical ointments or creams to the affected area. Make sure to wash your hands before and after application.",
+                "Hydration: Drink a glass of water to stay hydrated, which is important for overall skin health.",
+                "Breakfast: Have a balanced breakfast to fuel your body for the day.",
+                "Sun Protection: If going out, apply sunscreen to exposed areas and consider wearing protective clothing."
+            ];
+
+            const benignThroughoutTheDayChecklist = [
+                "Throughout the Day:",
+                "Hydration: Continue to drink water throughout the day to maintain good hydration.",
+                "Skin Care: Avoid scratching or rubbing the affected area and avoid harsh soaps or chemicals when washing your hands or any part of your body."
+            ];
+
+            const benignLunchtimeChecklist = [
+                "Lunchtime:",
+                "Medication: Take any prescribed mid-day medications, if applicable.",
+                "Healthy Meal: Have a nutritious lunch."
+            ];
+
+            const benignAfternoonChecklist = [
+                "Afternoon:",
+                "Ointment Application: Reapply any prescribed topical ointments or creams to the affected area as directed by your healthcare provider."
+            ];
+
+            const benignEveningChecklist = [
+                "Evening Routine:",
+                "Medication: Take any prescribed evening medications as directed.",
+                "Ointment Application: Apply any prescribed topical ointments or creams to the affected area.",
+                "Dinner: Enjoy a balanced and healthy dinner."
+            ];
+
+            const benignBeforeBedChecklist = [
+                "Before Bed:",
+                "Medication: Take any prescribed bedtime medications, if applicable.",
+                "Ointment Application: Apply the last dose of any prescribed topical ointments or creams for the day.",
+                "Relaxation: Practice relaxation techniques like deep breathing to help reduce stress, which can affect skin conditions."
+            ];
+
+            const benignGeneralGuidelinesChecklist = [
+                "General Guidelines:",
+                "Keep a Journal: Maintain a daily journal to record your medication doses, ointment applications, and any changes in your skin condition.",
+                "Stay in Contact: If you experience any unexpected side effects or changes in your skin condition, contact your healthcare provider immediately."
+            ];
+
+            createChecklistTable([
+                benignMorningChecklist,
+                benignThroughoutTheDayChecklist,
+                benignLunchtimeChecklist,
+                benignAfternoonChecklist,
+                benignEveningChecklist,
+                benignBeforeBedChecklist,
+                benignGeneralGuidelinesChecklist
+            ]);
+        }
+
+        function displayMalignantChecklist() {
+            const malignantMorningChecklist = [
+                "Morning Routine:",
+                "Medication: Take any prescribed oral chemotherapy or other medications as directed by your oncologist. Note down the name of the medication, dosage, and time.",
+                "Ointment Application: Apply any prescribed wound-care or skin treatment ointments to the affected area. Make sure to wash your hands before and after application.",
+                "Hydration: Drink a glass of water to stay hydrated, which is crucial for overall health.",
+                "Breakfast: Have a nutritious breakfast to fuel your body for the day.",
+                "Sun Protection: If going out, apply sunscreen to exposed areas and consider wearing protective clothing."
+            ];
+
+            const malignantThroughoutTheDayChecklist = [
+                "Throughout the Day:",
+                "Hydration: Continue to drink water throughout the day to maintain good hydration.",
+                "Pain Management: Take prescribed pain medications or follow pain management strategies as advised by your healthcare provider.",
+                "Skin Care: Handle the affected area gently, avoiding any friction, and use gentle, fragrance-free products for washing and moisturizing."
+            ];
+
+            const malignantLunchtimeChecklist = [
+                "Lunchtime:",
+                "Medication: Take any mid-day medications as prescribed by your oncologist.",
+                "Healthy Meal: Consume a balanced and nourishing lunch."
+            ];
+
+            const malignantAfternoonChecklist = [
+                "Afternoon:",
+                "Ointment Application: Reapply any prescribed ointments or creams to the affected area as directed by your healthcare provider."
+            ];
+
+            const malignantEveningChecklist = [
+                "Evening Routine:",
+                "Medication: Take any evening medications as prescribed.",
+                "Ointment Application: Apply the last dose of any prescribed ointments or creams for the day.",
+                "Dinner: Have a healthy and well-balanced dinner."
+            ];
+
+            const malignantBeforeBedChecklist = [
+                "Before Bed:",
+                "Medication: Take any prescribed bedtime medications or pain management medications, if applicable.",
+                "Relaxation: Practice relaxation techniques before bedtime to manage stress and improve sleep."
+            ];
+
+            const malignantGeneralGuidelinesChecklist = [
+                "General Guidelines:",
+                "Keep a Journal: Maintain a daily journal to record your medication doses, ointment applications, and any changes in your skin condition.",
+                "Stay in Contact: If you experience any unexpected side effects, complications, or changes in your skin condition, contact your oncologist or healthcare provider immediately."
+            ];
+
+            createChecklistTable([
+                malignantMorningChecklist,
+                malignantThroughoutTheDayChecklist,
+                malignantLunchtimeChecklist,
+                malignantAfternoonChecklist,
+                malignantEveningChecklist,
+                malignantBeforeBedChecklist,
+                malignantGeneralGuidelinesChecklist
+            ]);
+        }
+
+        function createChecklistTable(checklistData) {
+            const table = document.createElement("table");
+            table.id = "checklist-table";
+
+            checklistData.forEach(checklist => {
+                checklist.forEach((item, index) => {
+                    const row = table.insertRow();
+                    const cell1 = row.insertCell(0);
+                    const cell2 = row.insertCell(1);
+
+                    // If it's a section heading, style it
+                    if (item.includes("Routine:") || item === "Throughout the Day:" || item === "General Guidelines:") {
+                        row.style.fontWeight = "bold";
+                        row.style.backgroundColor = "black";
+                        cell1.innerHTML = "&nbsp;"; // Empty cell for checkboxes
+                        cell2.style.color = "white";
+                    }
+
+                    // Skip the checkboxes in headings
+                    if (!item.includes("Routine:") && item !== "Throughout the Day:" && item !== "General Guidelines:") {
+                        const checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.addEventListener("change", function () {
+                            // Check if all checkboxes in the table are checked
+                            const checkboxes = table.querySelectorAll('input[type="checkbox"]');
+                            allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+                            document.getElementById("submit-button").disabled = !allChecked;
+                        });
+                        cell1.appendChild(checkbox);
+                    }
+
+                    cell2.innerHTML = item;
+                });
+            });
+
+            checklistElement.appendChild(table);
+
+            // Initially, the submit button is disabled
+            document.getElementById("submit-button").disabled = true;
+        }
+
+        // Add a click event listener to the submit button
+        const submitButton = document.getElementById("submit-button");
+        submitButton.addEventListener("click", function () {
+            // If all checkboxes are checked, update the status and set 'allChecked' to true
+            if (allChecked) {
+                const userEmail = sessionStorage.getItem("userEmail"); // Get the user's email from the session
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'submit.php', true);
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        alert("Checklist updated successfully!");
+                    } else {
+                        alert("Failed to update the checklist.");
+                    }
+                };
+
+                xhr.send(`email=${userEmail}&status=Done`);
+                allChecked = true;
+                submitButton.disabled = true;
+            }
+        });
+
+        displayChecklist();
+    </script>
+</body>
+</html>

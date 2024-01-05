@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 300px;
+            margin: 0 auto;
+            margin-top: 100px;
+        }
+
+        .form-group {
+            margin: 10px 0;
+        }
+
+        label {
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .admin-form {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <div id="patient-form" class="login-form">
+            <h2>Patient Login</h2>
+            <form action="patient_authenticate.php" method="post">
+                <div class="form-group">
+                    <label for="patient_email">Email:</label>
+                    <input type="text" id="patient_email" name="patient_email" required>
+                </div>
+                <div class="form-group">
+                    <label for="patient_password">Password:</label>
+                    <input type="password" id="patient_password" name="patient_password" required>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Patient Login">
+                </div>
+            </form>
+        </div>
+
+        <div id="admin-form" class="login-form">
+            <h2>Admin Login</h2>
+            <form action="admin_authenticate.php" method="post">
+                <div class="form-group">
+                    <label for="admin_email">Email:</label>
+                    <input type="text" id="admin_email" name="admin_email" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin_password">Password:</label>
+                    <input type="password" id="admin_password" name="admin_password" required>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Admin Login">
+                </div>
+            </form>
+        </div>
+
+        <button id="toggle-btn">Switch to Admin Login</button>
+    </div>
+
+    <script>
+        // Initially, the patient login form is displayed
+        document.getElementById("admin-form").style.display = "none";
+
+        document.getElementById("toggle-btn").addEventListener("click", function () {
+            const patientForm = document.getElementById("patient-form");
+            const adminForm = document.getElementById("admin-form");
+            const toggleButton = document.getElementById("toggle-btn");
+
+            if (patientForm.style.display === "none") {
+                patientForm.style.display = "block";
+                adminForm.style.display = "none";
+                toggleButton.textContent = "Switch to Admin Login";
+            } else {
+                patientForm.style.display = "none";
+                adminForm.style.display = "block";
+                toggleButton.textContent = "Switch to Patient Login";
+            }
+        });
+
+        <!-- After storing the email in sessionStorage -->
+document.getElementById("patient-form").addEventListener("submit", function (e) {
+    const patientEmail = document.getElementById("patient_email").value;
+    sessionStorage.setItem("userEmail", patientEmail);
+    // Redirect to the appropriate dashboard
+    window.location.href = "patient_dashboard.html";
+});
+
+// Modify the code for the admin login form
+document.getElementById("admin-form").addEventListener("submit", function (e) {
+    const adminEmail = document.getElementById("admin_email").value;
+    sessionStorage.setItem("userEmail", adminEmail);
+    // Redirect to the admin dashboard
+    window.location.href = "admin_dashboard.html";
+});
+
+        
+    </script>
+</body>
+</html>

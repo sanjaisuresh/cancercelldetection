@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            background-image: url('animated-svg.gif'); /* Specify the correct path to your GIF file */
+        background-size: cover; /* This will scale the image to cover the entire body element */
+        background-repeat: no-repeat; 
+        }
+
+        header {
+            background-color: black;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-button {
+            margin: 0 10px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            color: #f0f0f0
+        }
+
+        .button-container {
+            margin: 130px auto;
+        }
+
+        button {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 18px;
+            background-color: black;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: black;
+        }
+
+        .profile-btn {
+            position: absolute;
+            margin-top: 10px;
+            right: 10px;
+            cursor: pointer;
+            width: 65px;
+            height: 30px;
+            background-color: #435360;
+            color: white;
+            border: none;
+            border-radius: 70%;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+     
+        /* Styling for the modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            width: 70%;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        /* Styling for the close button in the modal */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="nav-buttons">
+            <div class="nav-button" id="home-button">Home</div>
+            <div class="nav-button" id="about-button">About</div>
+            <div class="nav-button" id="contact-button">Contact Us</div>
+        </div>
+        <button class="profile-btn" id="profile-btn"><i class="fas fa-user"></i></button>
+    </header>
+    <div class="container">
+        <h1 style="margin-top: 100px;">Welcome to the Admin Dashboard</h1>
+        <div class="button-container">
+            <button id="add-patients-btn" style="background-color: black;">ADD NEW PATIENTS</button>
+            <button id="check-progress-btn" style="background-color: black;">CHECK PATIENTS PROGRESS</button>
+            <button id="check-disease-btn" style="background-color: black;">CHECK DISEASE</button>
+        </div>
+    </div>
+
+    <!-- Modal for displaying admin details -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="modal-close">&times;</span>
+            <h2>Your Profile</h2>
+            <p><strong>Name:</strong> <span id="modal-name"></span></p>
+            <p><strong>Email:</strong> <span id="modal-email"></span></p>
+            <!-- Add other profile details here -->
+        </div>
+    </div>
+
+    <script>
+        // Function to open the modal and fetch admin details
+        function openProfileModal() {
+            const adminEmail = sessionStorage.getItem("userEmail"); // Get the admin's email from the session
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `get_admin_profile.php?email=${adminEmail}`, true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const adminData = JSON.parse(xhr.responseText);
+                    document.getElementById("modal-name").textContent = adminData.name;
+                    document.getElementById("modal-email").textContent = adminData.email;
+
+                    modal.style.display = "block"; // Display the modal
+                } else {
+                    alert("Failed to fetch admin profile data.");
+                }
+            };
+
+            xhr.send();
+        }
+
+        const profileBtn = document.getElementById("profile-btn");
+        const modal = document.getElementById("myModal");
+        const modalClose = document.getElementById("modal-close");
+
+        // Close the modal when the "X" button is clicked
+        modalClose.addEventListener("click", function () {
+            modal.style.display = "none";
+        });
+
+        // Close the modal when clicking outside of it
+        window.addEventListener("click", function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        });
+
+        // Add a click event listener to the profile button
+        profileBtn.addEventListener("click", function () {
+            openProfileModal();
+        });
+        
+        // Add event listeners for the new buttons
+        const addPatientsBtn = document.getElementById("add-patients-btn");
+        const checkProgressBtn = document.getElementById("check-progress-btn");
+        const checkDiseaseBtn = document.getElementById("check-disease-btn");
+
+        addPatientsBtn.addEventListener("click", function () {
+            // Redirect to the add_patients.html page
+            window.location.href = "add_patients.html";
+        });
+
+        checkProgressBtn.addEventListener("click", function () {
+    // Redirect to the check_progress.html page
+    window.location.href = "check_progress.php";
+});
+
+checkDiseaseBtn.addEventListener("click", function () {
+    // Redirect to the checkdisease.php page
+    window.location.href = "checkdisease.php";
+});
+const aboutButton = document.getElementById("about-button");
+        const contactButton = document.getElementById("contact-button");
+        aboutButton.addEventListener("click", function () {
+            window.location.href = "about_patients.html";
+        });
+
+        contactButton.addEventListener("click", function () {
+            window.location.href = "contactus.html";
+        });
+    </script>
+</body>
+</html>
